@@ -9,7 +9,11 @@ import org.junit.*;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.*;
 
 public class AvaliadorTest {
 
@@ -17,6 +21,11 @@ public class AvaliadorTest {
     private Usuario joao;
     private Usuario jose;
     private Usuario maria;
+
+    @BeforeClass
+    public static void InicioDosTestes() {
+        System.out.println("Inicio dos testes da classe AvaliadorTest");
+    }
 
     @Before
     public void criaAvaliador() {
@@ -40,7 +49,10 @@ public class AvaliadorTest {
 
 
         assertEquals(400, leiloeiro.getMaiorLance(),0.00001);
-        assertEquals(200, leiloeiro.getMenorLance(),0.00001);
+
+        //assertEquals(200, leiloeiro.getMenorLance(),0.00001);
+        assertThat(leiloeiro.getMenorLance(),equalTo(200.0));
+
         assertEquals(300, leiloeiro.getMediaLance(),0.00001);
 
     }
@@ -113,9 +125,15 @@ public class AvaliadorTest {
 
         List<Lance> maiores = leiloeiro.getTresMaiores();
         assertEquals(3, maiores.size());
-        assertEquals(500.0, maiores.get(0).getValor(),0.00001);
-        assertEquals(450.0, maiores.get(1).getValor(),0.00001);
-        assertEquals(400.0, maiores.get(2).getValor(),0.00001);
+        assertThat(maiores, hasItems(
+                new Lance(joao, 500),
+                new Lance(jose, 450),
+                new Lance(jose, 400)
+        ));
+
+        //assertEquals(500.0, maiores.get(0).getValor(),0.00001);
+        //assertEquals(450.0, maiores.get(1).getValor(),0.00001);
+        //assertEquals(400.0, maiores.get(2).getValor(),0.00001);
 
     }
 
@@ -141,10 +159,15 @@ public class AvaliadorTest {
 
     }
 
-    @BeforeClass
-    public static void InicioDosTestes() {
-        System.out.println("Inicio dos testes da classe AvaliadorTest");
+    @Test(expected = RuntimeException.class)
+    public void naoDeveAvaliarLeiloesSemNenhumLanceDados() {
+
+        Leilao leilao = new CriadorDeLeilao().para("Playstation3").constroi();
+
+        leiloeiro.avalia(leilao);
     }
+
+
 
     @AfterClass
     public static void FimDosTestes() {
